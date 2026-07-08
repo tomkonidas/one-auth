@@ -80,7 +80,7 @@ defmodule OneAuth.MixProject do
   end
 
   defp description do
-    "A simple, database-free alternative to HTTP Basic Auth with session-based authentication for Plug-compatible applications."
+    "A simple, database-free alternative to HTTP Basic Auth with session-based authentication for Plug-compatible applications"
   end
 
   defp dialyzer do
