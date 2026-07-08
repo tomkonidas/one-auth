@@ -1,0 +1,54 @@
+# OneAuth
+
+A simple, database-free alternative to HTTP Basic Auth with session-based
+authentication for Plug-compatible applications.
+
+> [!WARNING]
+> OneAuth is under active development. APIs may change before the first stable release.
+
+## What is OneAuth?
+
+OneAuth provides lightweight authentication for applications that only need a
+single account and where a full user authentication system would be unnecessary.
+
+Instead of relying on browser-managed HTTP Basic Auth dialogs, OneAuth provides
+a normal login flow with session-backed authentication.
+
+## When to use OneAuth?
+
+OneAuth is designed for applications that need to protect access with a
+single account, without introducing a database-backed authentication system.
+
+Good fits include:
+
+- Personal dashboards
+- Internal tools
+- Admin interfaces
+- Small private applications
+
+OneAuth is not intended for applications requiring:
+
+- Multiple users
+- User registration
+- Password recovery
+- OAuth providers
+- Roles and permissions
+
+## Framework Compatibility
+
+OneAuth is built on `Plug` and is not tied to a specific web framework.
+
+It can be used with any `Plug`-compatible application, including Phoenix and
+other frameworks built on top of `Plug`.
+
+## Installation
+
+Add `:one_auth` to your list of dependencies in `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:one_auth, "~> 0.1"}
+  ]
+end
+```
