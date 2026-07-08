@@ -1,5 +1,7 @@
 # OneAuth
 
+[![CI](https://github.com/tomkonidas/one-auth/actions/workflows/ci.yml/badge.svg)](https://github.com/tomkonidas/one-auth/actions/workflows/ci.yml)
+
 A simple, database-free alternative to HTTP Basic Auth with session-based
 authentication for Plug-compatible applications.
 
