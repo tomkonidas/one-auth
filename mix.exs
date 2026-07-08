@@ -62,7 +62,8 @@ defmodule OneAuth.MixProject do
       source_ref: "v#{@version}",
       source_url: @url,
       extras: [
-        "README.md"
+        "README.md",
+        "LICENSE"
       ],
       groups_for_modules: [
         Plugs: [
