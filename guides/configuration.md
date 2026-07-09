@@ -10,7 +10,7 @@ The username accepted during authentication.
 
 ```elixir
 config :one_auth,
-  username: "admin"
+  username: System.fetch_env!("ONE_AUTH_USERNAME")
 ```
 
 
@@ -20,7 +20,25 @@ The password accepted during authentication.
 
 ```elixir
 config :one_auth,
-  password: "secret"
+  password: System.fetch_env!("ONE_AUTH_PASSWORD")
+```
+
+### `:signing_secret`
+
+A signing secret to generate and verify session tokens.
+
+The secret should be a cryptographically random value and should be kept
+private.
+
+```elixir
+config :one_auth,
+  signing_secret: System.fetch_env!("ONE_AUTH_SIGNING_SECRET")
+```
+
+You can generate a safe and secure signing secret using:
+
+```bash
+elixir -e "IO.puts(:crypto.strong_rand_bytes(64) |> Base.url_encode64())"
 ```
 
 ## Optional options

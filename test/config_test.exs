@@ -17,9 +17,11 @@ defmodule OneAuth.ConfigTest do
     end
 
     test "raises when username is not configured" do
-      assert_raise RuntimeError, ~r/Missing required OneAuth configuration: :username/, fn ->
-        Config.username()
-      end
+      assert_raise RuntimeError,
+                   ~r/Missing required OneAuth configuration for :username/,
+                   fn ->
+                     Config.username()
+                   end
     end
   end
 
@@ -31,9 +33,27 @@ defmodule OneAuth.ConfigTest do
     end
 
     test "raises when password is not configured" do
-      assert_raise RuntimeError, ~r/Missing required OneAuth configuration: :password/, fn ->
-        Config.password()
-      end
+      assert_raise RuntimeError,
+                   ~r/Missing required OneAuth configuration for :password/,
+                   fn ->
+                     Config.password()
+                   end
+    end
+  end
+
+  describe "signing_secret/0" do
+    test "returns the signing secret" do
+      put_config(signing_secret: "secret")
+
+      assert Config.signing_secret() == "secret"
+    end
+
+    test "raises when signing secret is not configured" do
+      assert_raise RuntimeError,
+                   ~r/Missing required OneAuth configuration for :signing_secret/,
+                   fn ->
+                     Config.signing_secret()
+                   end
     end
   end
 
@@ -109,7 +129,8 @@ defmodule OneAuth.ConfigTest do
           :password,
           :max_session_age,
           :login_path,
-          :after_login_path
+          :after_login_path,
+          :signing_secret
         ] do
       Application.delete_env(:one_auth, key)
     end

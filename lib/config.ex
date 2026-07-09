@@ -16,7 +16,7 @@ defmodule OneAuth.Config do
 
       :error ->
         raise """
-        Missing required OneAuth configuration: :username.
+        Missing required OneAuth configuration for :username.
 
         Add the following to your runtime.exs:
 
@@ -36,12 +36,32 @@ defmodule OneAuth.Config do
 
       :error ->
         raise """
-        Missing required OneAuth configuration: :password.
+        Missing required OneAuth configuration for :password.
 
         Add the following to your runtime.exs:
 
             config :one_auth,
               password: System.fetch_env!("ONE_AUTH_PASSWORD")
+
+        """
+    end
+  end
+
+  @doc false
+  @spec signing_secret() :: String.t()
+  def signing_secret do
+    case Application.fetch_env(@app, :signing_secret) do
+      {:ok, value} ->
+        value
+
+      :error ->
+        raise """
+        Missing required OneAuth configuration for :signing_secret.
+
+        Add the following to your runtime.exs:
+
+            config :one_auth,
+              signing_secret: System.fetch_env!("ONE_AUTH_SIGNING_SECRET")
 
         """
     end

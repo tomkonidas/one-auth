@@ -64,7 +64,8 @@ The minimum required configuration is:
 ```elixir
 config :one_auth,
   username: System.fetch_env!("ONE_AUTH_USERNAME"),
-  password: System.fetch_env!("ONE_AUTH_PASSWORD")
+  password: System.fetch_env!("ONE_AUTH_PASSWORD"),
+  signing_secret: System.fetch_env!("ONE_AUTH_SIGNING_SECRET")
 ```
 
 Additional options are available for customizing session behavior and routes.
