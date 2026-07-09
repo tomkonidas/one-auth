@@ -85,6 +85,8 @@ defmodule OneAuth.MixProject do
 
   defp dialyzer do
     [
+      plt_file: {:no_warn, "priv/plts/one_auth.plt"},
+      plt_core_path: "priv/plts",
       plt_add_apps: [:mix]
     ]
   end
