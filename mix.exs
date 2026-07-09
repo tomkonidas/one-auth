@@ -63,7 +63,8 @@ defmodule OneAuth.MixProject do
       source_url: @url,
       extras: [
         "README.md",
-        "LICENSE"
+        "LICENSE",
+        "guides/configuration.md"
       ],
       groups_for_modules: [
         Plugs: [
@@ -71,7 +72,6 @@ defmodule OneAuth.MixProject do
           OneAuth.RequireAuth
         ],
         Internal: [
-          OneAuth.Config,
           OneAuth.Session,
           OneAuth.Verifier
         ]
