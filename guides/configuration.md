@@ -48,6 +48,9 @@ elixir -e "IO.puts(:crypto.strong_rand_bytes(64) |> Base.url_encode64())"
 
 The maximum lifetime of an authenticated session.
 
+The value is expressed in milliseconds. The `:timer` module provides convenient
+helpers such as `:timer.minutes/1`, `:timer.hours/1`, and `:timer.days/1`.
+
 Default:
 
 ```elixir
