@@ -35,7 +35,7 @@ defmodule OneAuth.Session do
   Returns `:error` if the token is invalid or expired.
   """
   @spec verify(String.t()) :: {:ok, session()} | :error
-  def verify(token) do
+  def verify(token) when is_binary(token) do
     with {:ok, binary} <- verify_signature(token),
          payload <- :erlang.binary_to_term(binary, [:safe]),
          true <- valid_age?(payload) do
@@ -45,6 +45,8 @@ defmodule OneAuth.Session do
         :error
     end
   end
+
+  def verify(_token), do: :error
 
   defp verify_signature(token) do
     MessageVerifier.verify(token, Config.signing_secret())

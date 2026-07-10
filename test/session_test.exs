@@ -32,6 +32,10 @@ defmodule OneAuth.SessionTest do
       assert :error = Session.verify("invalid")
     end
 
+    test "returns :error for an invalid type" do
+      assert :error = Session.verify(:token)
+    end
+
     test "returns :error for an expired token" do
       put_config(max_session_age: 1)
 
