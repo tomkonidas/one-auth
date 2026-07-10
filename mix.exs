@@ -73,7 +73,8 @@ defmodule OneAuth.MixProject do
         ],
         Internal: [
           OneAuth.Session,
-          OneAuth.Credentials
+          OneAuth.Credentials,
+          OneAuth.Login
         ]
       ]
     ]
