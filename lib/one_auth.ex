@@ -52,4 +52,21 @@ defmodule OneAuth do
   """
   @spec login(String.t(), String.t()) :: {:ok, String.t()} | :error
   defdelegate login(username, password), to: Login, as: :authenticate
+
+  @doc """
+  Logs out the current OneAuth session.
+
+  Removes the OneAuth session token from the connection.
+
+  This does not invalidate previously issued tokens. Since OneAuth uses
+  signed stateless sessions, logout removes the token from the client's
+  session storage.
+
+  ## Examples
+
+      conn
+      |> OneAuth.logout()
+  """
+  @spec logout(Plug.Conn.t()) :: Plug.Conn.t()
+  defdelegate logout(conn), to: OneAuth.Plug
 end

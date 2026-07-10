@@ -68,13 +68,14 @@ defmodule OneAuth.MixProject do
       ],
       groups_for_modules: [
         Plugs: [
-          OneAuth.FetchAuth,
-          OneAuth.RequireAuth
+          OneAuth.Plug,
+          OneAuth.Plug.LoadSession,
+          OneAuth.Plug.RequireAuth
         ],
         Internal: [
-          OneAuth.Session,
           OneAuth.Credentials,
-          OneAuth.Login
+          OneAuth.Login,
+          OneAuth.Session
         ]
       ]
     ]
