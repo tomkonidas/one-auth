@@ -50,4 +50,28 @@ defmodule OneAuth.Plug do
   def logout(conn) do
     delete_session(conn, @session_key)
   end
+
+  @doc """
+  Returns the username of the currently authenticated user.
+
+  The user is read from the verified session payload loaded by
+  `OneAuth.Plug.LoadSession`.
+
+  Returns `nil` when no valid session exists.
+
+  ## Examples
+
+      username = OneAuth.current_user(conn)
+
+  """
+  @spec current_user(Plug.Conn.t()) :: String.t() | nil
+  def current_user(conn) do
+    case conn.assigns[:one_auth] do
+      %{"username" => username} ->
+        username
+
+      _ ->
+        nil
+    end
+  end
 end

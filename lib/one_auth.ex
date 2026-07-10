@@ -69,4 +69,19 @@ defmodule OneAuth do
   """
   @spec logout(Plug.Conn.t()) :: Plug.Conn.t()
   defdelegate logout(conn), to: OneAuth.Plug
+
+  @doc """
+  Returns the username of the currently authenticated user.
+
+  Returns `nil` when the connection does not contain a valid OneAuth session.
+
+  The connection must have passed through `OneAuth.Plug.LoadSession`.
+
+  ## Examples
+
+      username = OneAuth.current_user(conn)
+
+  """
+  @spec current_user(Plug.Conn.t()) :: String.t() | nil
+  defdelegate current_user(conn), to: OneAuth.Plug
 end
