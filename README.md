@@ -171,3 +171,7 @@ OneAuth.login_redirect_path(conn)
 ## License
 
 OneAuth is released under the [MIT License](LICENSE).
+
+---
+
+Maintainers: see [RELEASING.md](RELEASING.md) for the release process.

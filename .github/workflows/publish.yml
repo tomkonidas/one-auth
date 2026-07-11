@@ -1,0 +1,50 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish to Hex
+    runs-on: ubuntu-latest
+    environment: hex
+
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Setup Erlang and Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          version-file: mise.toml
+          version-type: strict
+          cache: true
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Verify release tag matches mix.exs version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          TAG_VERSION="${RELEASE_TAG#v}"
+          MIX_VERSION=$(grep -m1 '@version' mix.exs | sed -E 's/.*"([^"]+)".*/\1/')
+
+          if [ "$TAG_VERSION" != "$MIX_VERSION" ]; then
+            echo "Release tag ($RELEASE_TAG) does not match mix.exs version ($MIX_VERSION)"
+            exit 1
+          fi
+
+      - name: Run tests
+        run: mix test --warnings-as-errors
+
+      - name: Publish to Hex
+        run: mix hex.publish --yes
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
