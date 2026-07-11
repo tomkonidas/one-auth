@@ -43,35 +43,34 @@ git push
 
 Wait for CI to pass on that commit before continuing.
 
-## 4. Tag the release
-
-The tag **must** match the `source_ref: "v#{@version}"` format configured in
-`mix.exs`, or ExDoc's "View Source" links will point at a tag that doesn't
-exist:
-
-```bash
-git tag v0.2.0
-git push origin v0.2.0
-```
-
-## 5. Create the GitHub Release
+## 4. Create the GitHub Release
 
 This is OneAuth's changelog — see the README's "Changelog" link and the
 `Changelog` entry in `mix.exs`'s `package()` links, both of which point at
 the [Releases page](https://github.com/tomkonidas/one-auth/releases).
 
-Publishing to Hex happens automatically as soon as the release is published
-(see step 6 below), so double-check the release notes and the tag before
-clicking publish — there's no "draft" stage after this point.
+You don't need to create the tag separately — GitHub can create it for you
+at the moment you publish the release:
 
-1. Go to **Releases → Draft a new release** and select the `v0.2.0` tag.
-2. Click **Generate release notes** to group merged PRs automatically.
-3. Clean up the generated notes so they read as user-facing changes, not raw
+1. Go to **Releases → Draft a new release**.
+2. In **Choose a tag**, type a new tag name that matches
+   `source_ref: "v#{@version}"` in `mix.exs` exactly (e.g. `v0.2.0`) and
+   select **Create new tag: v0.2.0 on publish**. Leave the target as `main`.
+   Since the tag is created from whatever `main` points at when you publish,
+   do this step promptly after your version-bump commit passes CI in step 3
+   — if other commits land on `main` in between, the tag (and therefore the
+   published package) will include them too.
+3. Click **Generate release notes** to group merged PRs automatically.
+4. Clean up the generated notes so they read as user-facing changes, not raw
    PR titles — e.g. collapse routine dependency bumps into a single line
    rather than listing each Dependabot PR individually.
-4. Publish the release.
+5. Publish the release.
 
-## 6. Hex publishing (automatic)
+Publishing to Hex happens automatically the moment you do this (see step 5
+below), so double-check the release notes and the tag name before clicking
+publish — there's no "draft" stage after this point.
+
+## 5. Hex publishing (automatic)
 
 Publishing to Hex is handled by
 [`.github/workflows/publish.yml`](.github/workflows/publish.yml), which
@@ -86,17 +85,30 @@ triggers the moment a release is published in the step above. It:
 
 ### One-time setup
 
-Before the first automated release, generate a Hex API key for CI:
+Hex 2.4+ removed `mix hex.user key generate` in favor of an OAuth device flow
+for personal/local use, so generate the CI key from the Hex.pm dashboard
+instead of the CLI:
 
-```bash
-mix hex.user key generate --key-name publish-ci --permission api:write
-```
+1. Log in at [hex.pm](https://hex.pm), then **your username (top right) →
+   Dashboard → Keys → Generate new key**.
+2. Name it something identifiable, e.g. `publish-ci`.
+3. Give it write access to the API (not read-only) — a read-only key will
+   authenticate fine but `mix hex.publish` will fail partway through the
+   workflow rather than up front.
+4. Set an expiration (roughly a year is reasonable) rather than "never" — an
+   expiring key fails loudly in the `Publish` workflow when it lapses, which
+   is a safer failure mode than a permanently-valid credential sitting in a
+   GitHub secret indefinitely. When it expires, generate a new one and
+   update the `HEX_API_KEY` secret; the workflow doesn't need any other
+   changes.
+5. Copy the key value immediately — it's only shown once.
 
-Note this generates a personal key scoped to `api:write` — Hex doesn't offer
-a narrower, package-only scope for personal keys (only organization-owned
-keys support that). Treat it accordingly: don't reuse it elsewhere, and
-revoke and regenerate it (`mix hex.user key remove publish-ci`, then
-`generate` again) if it's ever exposed.
+Hex also requires **two-factor authentication enabled on your Hex account**
+for any key to have write access (Dashboard → Settings → Security). Without
+2FA, keys are silently downgraded to read-only, which shows up as the same
+"authenticates but publish fails" symptom as picking the wrong permission
+above — check this first if a key that should have write access doesn't
+seem to.
 
 Add the generated key as a secret named `HEX_API_KEY`, scoped to a GitHub
 Environment named `hex` (Settings → Environments → New environment → `hex` →
@@ -104,13 +116,6 @@ add secret). Using an environment rather than a repo-wide secret lets you
 optionally require a manual approval before the publish job runs, even after
 the release itself is published — a second checkpoint for an action that's
 otherwise hard to undo (see the note on revert windows below).
-
-If you generated the key via the Hex.pm dashboard rather than the CLI, set
-an expiration (roughly a year is reasonable) rather than "never" — an
-expiring key fails loudly in the `Publish` workflow when it lapses, which is
-a safer failure mode than a permanently-valid credential sitting in a GitHub
-secret indefinitely. When it expires, generate a new one and update the
-`HEX_API_KEY` secret; the workflow doesn't need any other changes.
 
 ### If something goes wrong
 
@@ -127,10 +132,10 @@ Otherwise, retire the version instead (it stays resolvable but shows a
 warning to anyone using it):
 
 ```bash
-mix hex.retire one_auth 0.2.0 --message "Reason for retiring this version"
+mix hex.retire one_auth 0.2.0 "Reason for retiring this version"
 ```
 
-## 7. Verify
+## 6. Verify
 
 Once the `Publish` workflow finishes on the release:
 
