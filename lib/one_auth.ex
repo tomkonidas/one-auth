@@ -22,7 +22,12 @@ defmodule OneAuth do
   `OneAuth.Plug.RequireAuth` to protect routes.
   """
 
+  import Plug.Conn
+
   alias OneAuth.Login
+
+  @session_key :one_auth_session
+  @assign_key :one_auth
 
   @doc """
   Authenticates the provided credentials and starts a new session.
@@ -68,6 +73,10 @@ defmodule OneAuth do
 
   Removes the OneAuth session from the Plug session.
 
+  Since OneAuth sessions are stateless signed tokens, this removes the token
+  from the client's session storage but does not revoke an already issued
+  token.
+
   ## Examples
 
       conn
@@ -76,7 +85,9 @@ defmodule OneAuth do
 
   """
   @spec logout(Plug.Conn.t()) :: Plug.Conn.t()
-  defdelegate logout(conn), to: OneAuth.Plug
+  def logout(conn) do
+    delete_session(conn, @session_key)
+  end
 
   @doc """
   Returns the username of the currently authenticated user.
@@ -91,5 +102,13 @@ defmodule OneAuth do
 
   """
   @spec current_user(Plug.Conn.t()) :: String.t() | nil
-  defdelegate current_user(conn), to: OneAuth.Plug
+  def current_user(conn) do
+    case conn.assigns[@assign_key] do
+      %{"username" => username} ->
+        username
+
+      _ ->
+        nil
+    end
+  end
 end

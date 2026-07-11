@@ -51,7 +51,8 @@ defmodule OneAuth.MixProject do
       licenses: ["MIT"],
       maintainers: ["Tom Konidas"],
       links: %{
-        "GitHub" => @url
+        "GitHub" => @url,
+        "Changelog" => "#{@url}/releases"
       }
     ]
   end
@@ -68,7 +69,6 @@ defmodule OneAuth.MixProject do
       ],
       groups_for_modules: [
         Plugs: [
-          OneAuth.Plug,
           OneAuth.Plug.LoadSession,
           OneAuth.Plug.RequireAuth
         ],

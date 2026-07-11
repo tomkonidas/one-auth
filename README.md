@@ -1,9 +1,15 @@
 # OneAuth
 
 [![CI](https://github.com/tomkonidas/one-auth/actions/workflows/ci.yml/badge.svg)](https://github.com/tomkonidas/one-auth/actions/workflows/ci.yml)
+[![Hex.pm](https://img.shields.io/hexpm/v/one_auth.svg)](https://hex.pm/packages/one_auth)
+[![Documentation](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/one_auth)
 
 A simple, database-free alternative to HTTP Basic Auth with session-based
 authentication for Plug-compatible applications.
+
+See the [Releases page](https://github.com/tomkonidas/one-auth/releases) for
+a changelog of notable changes between versions.
+
 
 > [!WARNING]
 > OneAuth is under active development. APIs may change before the first stable release.
@@ -69,9 +75,86 @@ config :one_auth,
 ```
 
 Additional options are available for customizing session behavior and routes.
+See the [Configuration guide](guides/configuration.md) for the full list.
+
+## Usage
+
+These examples use Phoenix, since it's the most common target for
+Plug-compatible applications. See [Framework Compatibility](#framework-compatibility)
+if you're using OneAuth outside of Phoenix.
+
+Add `OneAuth.Plug.LoadSession` to your `:browser` pipeline, after
+`:fetch_session`, so the current session is loaded on every request. Add
+`OneAuth.Plug.RequireAuth` to a separate pipeline for routes that require
+authentication:
+
+```elixir
+pipeline :browser do
+  plug :accepts, ["html"]
+  plug :fetch_session
+  # ...
+  plug OneAuth.Plug.LoadSession
+end
+
+pipeline :require_auth do
+  plug OneAuth.Plug.RequireAuth
+end
+
+scope "/", MyAppWeb do
+  pipe_through :browser
+
+  get "/login", SessionController, :new
+  post "/login", SessionController, :create
+  delete "/logout", SessionController, :delete
+end
+
+scope "/admin", MyAppWeb do
+  pipe_through [:browser, :require_auth]
+
+  get "/", AdminController, :index
+end
+```
+
+Handle the login and logout actions in a controller:
+
+```elixir
+defmodule MyAppWeb.SessionController do
+  use MyAppWeb, :controller
+
+  def new(conn, _params) do
+    render(conn, :new)
+  end
+
+  def create(conn, %{"username" => username, "password" => password}) do
+    case OneAuth.login(conn, username, password) do
+      {:ok, conn} ->
+        redirect(conn, to: OneAuth.login_redirect_path(conn))
+
+      :error ->
+        conn
+        |> put_flash(:error, "Invalid username or password")
+        |> redirect(to: "/login")
+    end
+  end
+
+  def delete(conn, _params) do
+    conn
+    |> OneAuth.logout()
+    |> redirect(to: "/login")
+  end
+end
+```
+
+Read the current user in any controller or template with `OneAuth.current_user/1`:
+
+```elixir
+OneAuth.current_user(conn)
+# => "admin" | nil
+```
 
 ## API
 
+```elixir
 OneAuth.login(conn, username, password)
 # => {:ok, conn} | :error
 
@@ -83,3 +166,8 @@ OneAuth.current_user(conn)
 
 OneAuth.login_redirect_path(conn)
 # => path
+```
+
+## License
+
+OneAuth is released under the [MIT License](LICENSE).
