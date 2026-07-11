@@ -80,3 +80,6 @@ OneAuth.logout(conn)
 
 OneAuth.current_user(conn)
 # => username | nil
+
+OneAuth.login_redirect_path(conn)
+# => path

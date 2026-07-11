@@ -1,10 +1,7 @@
 defmodule OneAuth do
   @moduledoc """
-  OneAuth provides simple username and password authentication with signed
-  session tokens for Plug-based applications.
-
-  It provides the building blocks needed to authenticate users, create and
-  verify sessions, and protect authenticated routes.
+  OneAuth provides simple username and password authentication for Plug-based
+  applications.
 
   ## Getting started
 
@@ -17,6 +14,9 @@ defmodule OneAuth do
 
   Authenticate users with `login/3`, access the current user with
   `current_user/1`, and end authenticated sessions with `logout/1`.
+
+  After a successful login, `login_redirect_path/1` returns the destination to
+  redirect the user to.
 
   Use `OneAuth.Plug.LoadSession` to load authenticated sessions and
   `OneAuth.Plug.RequireAuth` to protect routes.
@@ -37,7 +37,7 @@ defmodule OneAuth do
 
       case OneAuth.login(conn, username, password) do
         {:ok, conn} ->
-          redirect(conn, to: "/")
+          redirect(conn, to: OneAuth.login_redirect_path(conn))
 
         :error ->
           # Invalid credentials
@@ -46,6 +46,22 @@ defmodule OneAuth do
   """
   @spec login(Plug.Conn.t(), binary(), binary()) :: {:ok, Plug.Conn.t()} | :error
   defdelegate login(conn, username, password), to: Login, as: :authenticate
+
+  @doc """
+  Returns the destination path after a successful login.
+
+  If the login request includes a valid `redirect_to` query parameter, that
+  path is returned. Otherwise, the configured `after_login_path` is returned.
+
+  Only relative paths beginning with `/` are accepted.
+
+  ## Examples
+
+      redirect(conn, to: OneAuth.login_redirect_path(conn))
+
+  """
+  @spec login_redirect_path(Plug.Conn.t()) :: String.t()
+  defdelegate login_redirect_path(conn), to: Login, as: :redirect_path
 
   @doc """
   Ends the current authenticated session.

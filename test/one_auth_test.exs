@@ -10,7 +10,14 @@ defmodule OneAuthTest do
 
   setup do
     clear_config()
-    put_config(username: "admin", password: "password", signing_secret: "test-secret")
+
+    put_config(
+      username: "admin",
+      password: "password",
+      signing_secret: "test-secret",
+      after_login_path: "/dashboard"
+    )
+
     on_exit(&clear_config/0)
     :ok
   end
@@ -37,6 +44,28 @@ defmodule OneAuthTest do
         |> init_test_session(%{})
 
       assert :error = OneAuth.login(conn, "admin", "wrong")
+    end
+  end
+
+  describe "login_redirect_path/1" do
+    test "returns the redirect_to query parameter when present" do
+      conn = conn(:get, "/login?redirect_to=/admin")
+      assert OneAuth.login_redirect_path(conn) == "/admin"
+    end
+
+    test "returns the configured after_login_path when redirect_to is missing" do
+      conn = conn(:get, "/login")
+      assert OneAuth.login_redirect_path(conn) == "/dashboard"
+    end
+
+    test "returns the configured after_login_path for an absolute URL" do
+      conn = conn(:get, "/login?redirect_to=https://example.com")
+      assert OneAuth.login_redirect_path(conn) == "/dashboard"
+    end
+
+    test "returns the configured after_login_path for a protocol-relative URL" do
+      conn = conn(:get, "/login?redirect_to=//example.com")
+      assert OneAuth.login_redirect_path(conn) == "/dashboard"
     end
   end
 
@@ -81,7 +110,7 @@ defmodule OneAuthTest do
   end
 
   defp clear_config do
-    for key <- [:username, :password, :signing_secret] do
+    for key <- [:username, :password, :signing_secret, :after_login_path] do
       Application.delete_env(:one_auth, key)
     end
   end

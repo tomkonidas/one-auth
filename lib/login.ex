@@ -2,15 +2,14 @@ defmodule OneAuth.Login do
   @moduledoc """
   Implements the OneAuth login workflow.
 
-  This module validates the configured credentials and, on success,
-  creates and stores a signed session token in the Plug session.
-
-  Applications should typically use `OneAuth.login/3` instead of calling this
-  module directly.
+  This module validates the configured credentials, creates and stores a signed
+  session token, and determines where users should be redirected after a
+  successful login.
   """
 
   import Plug.Conn
 
+  alias OneAuth.Config
   alias OneAuth.Credentials
   alias OneAuth.Session
 
@@ -44,4 +43,43 @@ defmodule OneAuth.Login do
       :error
     end
   end
+
+  @doc """
+  Returns the destination path after a successful login.
+
+  If the login request includes a valid `redirect_to` query parameter, that
+  path is returned. Otherwise, the configured `after_login_path` is used.
+
+  Only relative paths beginning with `/` are accepted. Any other value is
+  ignored to prevent open redirect vulnerabilities.
+
+  ## Examples
+
+      Login.redirect_path(conn)
+      #=> "/admin"
+
+      Login.redirect_path(conn)
+      #=> "/"
+
+  """
+  @spec redirect_path(Plug.Conn.t()) :: String.t()
+  def redirect_path(conn) do
+    conn = fetch_query_params(conn)
+
+    case conn.query_params["redirect_to"] do
+      path when is_binary(path) ->
+        if valid_redirect_path?(path) do
+          path
+        else
+          Config.after_login_path()
+        end
+
+      _ ->
+        Config.after_login_path()
+    end
+  end
+
+  defp valid_redirect_path?(<<"/", "/", _::binary>>), do: false
+  defp valid_redirect_path?(<<"/", _::binary>>), do: true
+  defp valid_redirect_path?(_), do: false
 end
