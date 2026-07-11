@@ -145,13 +145,6 @@ defmodule MyAppWeb.SessionController do
 end
 ```
 
-Read the current user in any controller or template with `OneAuth.current_user/1`:
-
-```elixir
-OneAuth.current_user(conn)
-# => "admin" | nil
-```
-
 ## API
 
 ```elixir
