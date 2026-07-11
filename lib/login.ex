@@ -1,34 +1,45 @@
 defmodule OneAuth.Login do
   @moduledoc """
-  Provides the authentication workflow for OneAuth.
+  Implements the OneAuth login workflow.
 
-  This module coordinates credential verification and session creation.
-  Applications should typically use `OneAuth.login/2` instead of calling this
+  This module validates the configured credentials and, on success,
+  creates and stores a signed session token in the Plug session.
+
+  Applications should typically use `OneAuth.login/3` instead of calling this
   module directly.
-
-  A successful login returns a signed session token that can be stored using the
-  application's session mechanism.
   """
+
+  import Plug.Conn
 
   alias OneAuth.Credentials
   alias OneAuth.Session
 
+  @session_key :one_auth_session
+
   @doc """
-  Authenticates a user and creates a new session token.
+  Authenticates the provided credentials and starts a new session.
 
-  The provided credentials are compared against the configured OneAuth
-  credentials. When valid, a signed session token is returned.
+  When the supplied username and password match the configured OneAuth
+  credentials, a signed session token is created and stored in the Plug
+  session.
 
-  ## Returns
+  Returns `{:ok, conn}` on success or `:error` when authentication fails.
 
-    * `{:ok, token}` - Credentials are valid and a new session was created.
-    * `:error` - The provided credentials are invalid.
+  ## Examples
+
+      case Login.authenticate(conn, username, password) do
+        {:ok, conn} ->
+          # Redirect the authenticated user
+
+        :error ->
+          # Invalid credentials
+      end
 
   """
-  @spec authenticate(String.t(), String.t()) :: {:ok, String.t()} | :error
-  def authenticate(username, password) do
+  @spec authenticate(Plug.Conn.t(), String.t(), String.t()) :: {:ok, Plug.Conn.t()} | :error
+  def authenticate(conn, username, password) do
     if Credentials.valid?(username, password) do
-      {:ok, Session.create()}
+      {:ok, put_session(conn, @session_key, Session.create())}
     else
       :error
     end

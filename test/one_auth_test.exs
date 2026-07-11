@@ -6,6 +6,8 @@ defmodule OneAuthTest do
 
   alias OneAuth.Session
 
+  @session_key :one_auth_session
+
   setup do
     clear_config()
     put_config(username: "admin", password: "password", signing_secret: "test-secret")
@@ -13,14 +15,28 @@ defmodule OneAuthTest do
     :ok
   end
 
-  describe "login/2" do
-    test "returns a session token for valid credentials" do
-      assert {:ok, token} = OneAuth.login("admin", "password")
-      assert {:ok, _payload} = Session.verify(token)
+  describe "login/3" do
+    test "returns a connection with a session for valid credentials" do
+      conn =
+        :post
+        |> conn("/login")
+        |> init_test_session(%{})
+
+      assert {:ok, conn} = OneAuth.login(conn, "admin", "password")
+
+      token = get_session(conn, @session_key)
+      assert is_binary(token)
+      assert {:ok, payload} = Session.verify(token)
+      assert payload["username"] == "admin"
     end
 
     test "returns error for invalid credentials" do
-      assert :error = OneAuth.login("admin", "wrong")
+      conn =
+        :post
+        |> conn("/login")
+        |> init_test_session(%{})
+
+      assert :error = OneAuth.login(conn, "admin", "wrong")
     end
   end
 

@@ -69,3 +69,14 @@ config :one_auth,
 ```
 
 Additional options are available for customizing session behavior and routes.
+
+## API
+
+OneAuth.login(conn, username, password)
+# => {:ok, conn} | :error
+
+OneAuth.logout(conn)
+# => conn
+
+OneAuth.current_user(conn)
+# => username | nil

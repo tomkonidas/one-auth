@@ -15,57 +15,49 @@ defmodule OneAuth do
         password: "secret",
         signing_secret: "your-secret"
 
-  Authenticate users with `login/2`:
+  Authenticate users with `login/3`, access the current user with
+  `current_user/1`, and end authenticated sessions with `logout/1`.
 
-      case OneAuth.login(username, password) do
-        {:ok, token} ->
-          # Store the token in your session
-
-        :error ->
-          # Invalid credentials
-      end
-
-  Use `OneAuth.Plug.LoadSession` and `OneAuth.Plug.RequireAuth` to load and
-  protect authenticated requests.
+  Use `OneAuth.Plug.LoadSession` to load authenticated sessions and
+  `OneAuth.Plug.RequireAuth` to protect routes.
   """
 
   alias OneAuth.Login
 
   @doc """
-  Authenticates credentials and creates a new session token.
+  Authenticates the provided credentials and starts a new session.
 
-  Returns `{:ok, token}` when the provided username and password match the
-  configured OneAuth credentials.
+  When the supplied username and password match the configured OneAuth
+  credentials, a signed session token is created and stored in the Plug
+  session.
 
-  Returns `:error` when authentication fails.
+  Returns `{:ok, conn}` on success or `:error` when authentication fails.
 
   ## Examples
 
-      case OneAuth.login(username, password) do
-        {:ok, token} ->
-          put_session(conn, :one_auth_session, token)
+      case OneAuth.login(conn, username, password) do
+        {:ok, conn} ->
+          redirect(conn, to: "/")
 
         :error ->
-          # Handle invalid credentials
+          # Invalid credentials
       end
 
   """
-  @spec login(String.t(), String.t()) :: {:ok, String.t()} | :error
-  defdelegate login(username, password), to: Login, as: :authenticate
+  @spec login(Plug.Conn.t(), binary(), binary()) :: {:ok, Plug.Conn.t()} | :error
+  defdelegate login(conn, username, password), to: Login, as: :authenticate
 
   @doc """
-  Logs out the current OneAuth session.
+  Ends the current authenticated session.
 
-  Removes the OneAuth session token from the connection.
-
-  This does not invalidate previously issued tokens. Since OneAuth uses
-  signed stateless sessions, logout removes the token from the client's
-  session storage.
+  Removes the OneAuth session from the Plug session.
 
   ## Examples
 
       conn
       |> OneAuth.logout()
+      |> redirect(to: "/login")
+
   """
   @spec logout(Plug.Conn.t()) :: Plug.Conn.t()
   defdelegate logout(conn), to: OneAuth.Plug
@@ -73,7 +65,7 @@ defmodule OneAuth do
   @doc """
   Returns the username of the currently authenticated user.
 
-  Returns `nil` when the connection does not contain a valid OneAuth session.
+  Returns `nil` when no authenticated session exists.
 
   The connection must have passed through `OneAuth.Plug.LoadSession`.
 
