@@ -15,8 +15,11 @@ defmodule OneAuth do
   Authenticate users with `login/3`, access the current user with
   `current_user/1`, and end authenticated sessions with `logout/1`.
 
-  After a successful login, `login_redirect_path/1` returns the destination to
-  redirect the user to.
+  Use `login_path/1` to link to the login page — pass it the current conn and
+  it preserves where to redirect back to afterward, whether that's a page a
+  user was redirected away from or the login page's own form re-submitting
+  after a failed attempt. After a successful login, `login_redirect_path/1`
+  returns the destination to redirect the user to.
 
   Use `OneAuth.Plug.LoadSession` to load authenticated sessions and
   `OneAuth.Plug.RequireAuth` to protect routes.
@@ -51,6 +54,32 @@ defmodule OneAuth do
   """
   @spec login(Plug.Conn.t(), binary(), binary()) :: {:ok, Plug.Conn.t()} | :error
   defdelegate login(conn, username, password), to: Login, as: :authenticate
+
+  @doc """
+  Returns the configured login path, optionally with a `redirect_to` query
+  parameter appended so `login_redirect_path/1` can send the user back there
+  after a successful login.
+
+  Pass the current `Plug.Conn.t()` and the right thing happens either way:
+
+    * If the conn already has a `redirect_to` query parameter (e.g. it's the
+      request to render or submit the login page itself, after
+      `OneAuth.Plug.RequireAuth` redirected here), that value is reused as-is.
+    * Otherwise, the conn's own request path is used as the `redirect_to` —
+      handy for a "Log in" link anywhere in your app that should return the
+      user to the page they were on.
+
+  ## Examples
+
+      OneAuth.login_path(conn)
+      #=> "/login"
+
+      OneAuth.login_path(conn)
+      #=> "/login?redirect_to=%2Fapps"
+
+  """
+  @spec login_path(Plug.Conn.t()) :: String.t()
+  defdelegate login_path(conn), to: Login, as: :path
 
   @doc """
   Returns the destination path after a successful login.

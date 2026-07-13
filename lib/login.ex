@@ -45,6 +45,63 @@ defmodule OneAuth.Login do
   end
 
   @doc """
+  Returns the configured login path, optionally with a `redirect_to` query
+  parameter appended so `redirect_path/1` can send the user back there after
+  a successful login.
+
+  Pass the current `Plug.Conn.t()` and the right thing happens either way:
+
+    * If the conn already has a `redirect_to` query parameter (e.g. it's the
+      request to render or submit the login page itself, after
+      `OneAuth.Plug.RequireAuth` redirected here), that value is reused as-is.
+    * Otherwise, the conn's own request path (and query string, if any) is
+      used as the `redirect_to` — handy for a "Log in" link anywhere in your
+      app that should return the user to the page they were on.
+
+  This mirrors what `OneAuth.Plug.RequireAuth` builds internally when it
+  redirects an unauthenticated request to the login page, so it's the same
+  URL format `redirect_path/1` expects to read back.
+
+  ## Examples
+
+      Login.path(conn)
+      #=> "/login"
+
+      Login.path(conn)
+      #=> "/login?redirect_to=%2Fadmin"
+
+  """
+  @spec path(Plug.Conn.t()) :: String.t()
+  def path(%Plug.Conn{} = conn) do
+    redirect_to = existing_redirect_to(conn) || return_path(conn)
+    default_login_path = Config.login_path()
+
+    if redirect_to == default_login_path do
+      default_login_path
+    else
+      query = URI.encode_query(%{"redirect_to" => redirect_to})
+      "#{Config.login_path()}?#{query}"
+    end
+  end
+
+  defp existing_redirect_to(conn) do
+    conn
+    |> fetch_query_params()
+    |> Map.fetch!(:query_params)
+    |> Map.get("redirect_to")
+  end
+
+  defp return_path(conn) do
+    case conn.query_string do
+      "" ->
+        conn.request_path
+
+      query_string ->
+        "#{conn.request_path}?#{query_string}"
+    end
+  end
+
+  @doc """
   Returns the destination path after a successful login.
 
   If the login request includes a valid `redirect_to` query parameter, that

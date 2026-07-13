@@ -47,6 +47,24 @@ defmodule OneAuthTest do
     end
   end
 
+  describe "login_path/1" do
+    test "returns configured login path on normal flow" do
+      login_path = OneAuth.Config.login_path()
+      conn = conn(:get, login_path)
+      assert OneAuth.login_path(conn) == login_path
+    end
+
+    test "appends redirect_to derived from the given conn" do
+      conn = conn(:get, "/admin/dashboard")
+      assert OneAuth.login_path(conn) == "/login?redirect_to=%2Fadmin%2Fdashboard"
+    end
+
+    test "retains query string arguments" do
+      conn = conn(:get, "/products?id=123")
+      assert OneAuth.login_path(conn) == "/login?redirect_to=%2Fproducts%3Fid%3D123"
+    end
+  end
+
   describe "login_redirect_path/1" do
     test "returns the redirect_to query parameter when present" do
       conn = conn(:get, "/login?redirect_to=/admin")

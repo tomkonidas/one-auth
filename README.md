@@ -133,7 +133,7 @@ defmodule MyAppWeb.SessionController do
       :error ->
         conn
         |> put_flash(:error, "Invalid username or password")
-        |> redirect(to: "/login")
+        |> redirect(to: OneAuth.login_path(conn))
     end
   end
 
@@ -145,20 +145,63 @@ defmodule MyAppWeb.SessionController do
 end
 ```
 
+Setup the login HTML form:
+
+```elixir
+defmodule MyAppWeb.SessionHTML do
+  use MyAppWeb, :html
+
+  def new(assigns) do
+    ~H"""
+    <h1>Log in to your account</h1>
+
+    <.simple_form for={%{}} action={OneAuth.login_path(@conn)}>
+      <input
+        id="username"
+        type="text"
+        name="username"
+        placeholder="Username"
+        autocomplete="username"
+        aria-label="Username"
+        required
+      />
+
+      <input
+        id="password"
+        type="password"
+        name="password"
+        placeholder="Password"
+        autocomplete="current-password"
+        aria-label="Password"
+        required
+      />
+
+      <:actions>
+        <.button phx-disable-with="Logging in...">Log in</.button>
+      </:actions>
+    </.simple_form>
+    """
+  end
+end
+```
+
 ## API
 
 ```elixir
 OneAuth.login(conn, username, password)
 # => {:ok, conn} | :error
 
+OneAuth.login_path(conn)
+# => path
+
+OneAuth.login_redirect_path(conn)
+# => path
+
 OneAuth.logout(conn)
 # => conn
 
 OneAuth.current_user(conn)
 # => username | nil
-
-OneAuth.login_redirect_path(conn)
-# => path
 ```
 
 ## License
