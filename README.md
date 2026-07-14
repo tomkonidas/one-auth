@@ -257,7 +257,7 @@ pipeline :browser do
 end
 
 def assign_current_user(conn, _opts) do
-  Plug.Conn.assign(conn, :current_user, OneAuth.current_user(conn))
+  assign(conn, :current_user, OneAuth.current_user(conn))
 end
 ```
 
