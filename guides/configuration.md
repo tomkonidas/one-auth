@@ -13,7 +13,6 @@ config :one_auth,
   username: System.fetch_env!("ONE_AUTH_USERNAME")
 ```
 
-
 ### `:password`
 
 The password accepted during authentication.
@@ -43,7 +42,6 @@ elixir -e "IO.puts(:crypto.strong_rand_bytes(64) |> Base.url_encode64())"
 
 ## Optional options
 
-
 ### `:max_session_age`
 
 The maximum lifetime of an authenticated session.
@@ -63,7 +61,6 @@ Example:
 config :one_auth,
   max_session_age: :timer.hours(12)
 ```
-
 
 ### `:login_path`
 
