@@ -17,7 +17,7 @@ defmodule OneAuth.ConfigTest do
     end
 
     test "raises when username is not configured" do
-      assert_raise RuntimeError,
+      assert_raise ArgumentError,
                    ~r/Missing required OneAuth configuration for :username/,
                    fn ->
                      Config.username()
@@ -33,7 +33,7 @@ defmodule OneAuth.ConfigTest do
     end
 
     test "raises when password is not configured" do
-      assert_raise RuntimeError,
+      assert_raise ArgumentError,
                    ~r/Missing required OneAuth configuration for :password/,
                    fn ->
                      Config.password()
@@ -49,7 +49,7 @@ defmodule OneAuth.ConfigTest do
     end
 
     test "raises when signing secret is not configured" do
-      assert_raise RuntimeError,
+      assert_raise ArgumentError,
                    ~r/Missing required OneAuth configuration for :signing_secret/,
                    fn ->
                      Config.signing_secret()

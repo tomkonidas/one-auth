@@ -15,7 +15,7 @@ defmodule OneAuth.Config do
         value
 
       :error ->
-        raise """
+        raise ArgumentError, """
         Missing required OneAuth configuration for :username.
 
         Add the following to your runtime.exs:
@@ -35,7 +35,7 @@ defmodule OneAuth.Config do
         value
 
       :error ->
-        raise """
+        raise ArgumentError, """
         Missing required OneAuth configuration for :password.
 
         Add the following to your runtime.exs:
@@ -55,7 +55,7 @@ defmodule OneAuth.Config do
         value
 
       :error ->
-        raise """
+        raise ArgumentError, """
         Missing required OneAuth configuration for :signing_secret.
 
         Add the following to your runtime.exs:

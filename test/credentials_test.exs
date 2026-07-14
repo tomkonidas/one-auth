@@ -30,7 +30,7 @@ defmodule OneAuth.CredentialsTest do
     test "raises when credentials are not configured" do
       clear_config()
 
-      assert_raise RuntimeError, ~r/Missing required OneAuth configuration/, fn ->
+      assert_raise ArgumentError, ~r/Missing required OneAuth configuration/, fn ->
         Credentials.valid?("admin", "secret")
       end
     end
