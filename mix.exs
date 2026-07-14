@@ -30,6 +30,8 @@ defmodule OneAuth.MixProject do
     [
       {:plug, "~> 1.20"},
       {:ex_doc, "~> 0.40", only: :dev, runtime: false, warn_if_outdated: true},
+      {:makeup_eex, "~> 2.0", only: :dev, runtime: false},
+      {:makeup_html, "~> 0.2", only: :dev, runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
@@ -59,7 +61,7 @@ defmodule OneAuth.MixProject do
 
   defp docs do
     [
-      main: "OneAuth",
+      main: "readme",
       source_ref: "v#{@version}",
       source_url: @url,
       extras: [
@@ -73,6 +75,7 @@ defmodule OneAuth.MixProject do
           OneAuth.Plug.RequireAuth
         ],
         Internal: [
+          OneAuth.Config,
           OneAuth.Credentials,
           OneAuth.Login,
           OneAuth.Session

@@ -110,7 +110,7 @@ defmodule OneAuth do
 
       conn
       |> OneAuth.logout()
-      |> redirect(to: "/login")
+      |> redirect(to: OneAuth.login_path(conn))
 
   """
   @spec logout(Plug.Conn.t()) :: Plug.Conn.t()
