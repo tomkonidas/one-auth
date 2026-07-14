@@ -10,7 +10,7 @@ authentication for Plug-compatible applications.
 See the [Releases page](https://github.com/tomkonidas/one-auth/releases) for
 a changelog of notable changes between versions.
 
-> **Warning**
+> [!WARNING]
 > OneAuth is under active development. APIs may change before the first stable release.
 
 ## Table of Contents
@@ -54,7 +54,7 @@ OneAuth is **not** intended for applications requiring:
 - OAuth providers
 - Roles and permissions
 
-OneAuth is built on `Plug`, so it isn't tied to a specific web framework.
+OneAuth is built on [Plug](https://plug.hexdocs.pm/), so it isn't tied to a specific web framework.
 It works with any `Plug`-compatible application, including Phoenix and
 other frameworks built on top of `Plug`. The examples below use Phoenix
 since it's the most common target.
