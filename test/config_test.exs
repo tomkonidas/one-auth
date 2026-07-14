@@ -105,15 +105,15 @@ defmodule OneAuth.ConfigTest do
     end
   end
 
-  describe "after_login_path/0" do
+  describe "login_redirect_path/0" do
     test "returns the configured after login path" do
-      put_config(after_login_path: "/dashboard")
+      put_config(login_redirect_path: "/dashboard")
 
-      assert Config.after_login_path() == "/dashboard"
+      assert Config.login_redirect_path() == "/dashboard"
     end
 
     test "returns the default after login path when not configured" do
-      assert Config.after_login_path() == "/"
+      assert Config.login_redirect_path() == "/"
     end
   end
 
@@ -129,7 +129,7 @@ defmodule OneAuth.ConfigTest do
           :password,
           :max_session_age,
           :login_path,
-          :after_login_path,
+          :login_redirect_path,
           :signing_secret
         ] do
       Application.delete_env(:one_auth, key)

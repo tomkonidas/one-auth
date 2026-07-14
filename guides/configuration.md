@@ -82,7 +82,7 @@ config :one_auth,
   login_path: "/admin/login"
 ```
 
-### `:after_login_path`
+### `:login_redirect_path`
 
 The fallback path to redirect users to after successful authentication when no
 return path is available.
@@ -97,5 +97,5 @@ Example:
 
 ```elixir
 config :one_auth,
-  after_login_path: "/dashboard"
+  login_redirect_path: "/dashboard"
 ```

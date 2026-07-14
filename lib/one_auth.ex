@@ -85,7 +85,7 @@ defmodule OneAuth do
   Returns the destination path after a successful login.
 
   If the login request includes a valid `redirect_to` query parameter, that
-  path is returned. Otherwise, the configured `after_login_path` is returned.
+  path is returned. Otherwise, the configured `login_redirect_path` is returned.
 
   Only relative paths beginning with `/` are accepted.
 

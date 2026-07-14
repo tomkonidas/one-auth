@@ -105,7 +105,7 @@ defmodule OneAuth.Login do
   Returns the destination path after a successful login.
 
   If the login request includes a valid `redirect_to` query parameter, that
-  path is returned. Otherwise, the configured `after_login_path` is used.
+  path is returned. Otherwise, the configured `login_redirect_path` is used.
 
   Only relative paths beginning with `/` are accepted. Any other value is
   ignored to prevent open redirect vulnerabilities.
@@ -128,11 +128,11 @@ defmodule OneAuth.Login do
         if valid_redirect_path?(path) do
           path
         else
-          Config.after_login_path()
+          Config.login_redirect_path()
         end
 
       _ ->
-        Config.after_login_path()
+        Config.login_redirect_path()
     end
   end
 

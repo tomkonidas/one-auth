@@ -5,7 +5,7 @@ defmodule OneAuth.Config do
 
   @default_max_session_age :timer.hours(24)
   @default_login_path "/login"
-  @default_after_login_path "/"
+  @default_login_redirect_path "/"
 
   @doc false
   @spec username() :: String.t()
@@ -93,8 +93,8 @@ defmodule OneAuth.Config do
   end
 
   @doc false
-  @spec after_login_path() :: String.t()
-  def after_login_path do
-    Application.get_env(@app, :after_login_path, @default_after_login_path)
+  @spec login_redirect_path() :: String.t()
+  def login_redirect_path do
+    Application.get_env(@app, :login_redirect_path, @default_login_redirect_path)
   end
 end
